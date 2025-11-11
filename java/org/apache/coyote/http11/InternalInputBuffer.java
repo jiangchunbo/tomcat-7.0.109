@@ -104,10 +104,13 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             }
             // Set the start time once we start reading data (even if it is
             // just skipping blank lines)
+            // 好像默认是 -1，也就是未初始化
             if (request.getStartTime() < 0) {
                 request.setStartTime(System.currentTimeMillis());
             }
             chr = buf[pos++];
+
+            // 直到读取到一个 \r 或 \n
         } while (chr == Constants.CR || chr == Constants.LF);
 
         pos--;
@@ -132,6 +135,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
             // Spec says method name is a token followed by a single SP but
             // also be tolerant of multiple SP and/or HT.
+            // 如果读取到了一个空格，或者一个制表符，就标记 space，循环退出
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 request.method().setBytes(buf, start, pos - start);

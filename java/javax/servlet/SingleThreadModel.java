@@ -42,4 +42,8 @@ package javax.servlet;
 // Spec API does not use @Deprecated
 public interface SingleThreadModel {
     // No methods
+
+    // 只是一个标记接口，Servlet 实现了这个接口就表示每个请求单独创建一个 Servlet
+
+
 }

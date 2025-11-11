@@ -40,7 +40,14 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     private int limit = -1;
 
+    /**
+     * 表示某一段字节数组中一个字节块的 start
+     */
     protected int start;
+
+    /**
+     * 表示某一段字节数组中一个字节块的 end
+     */
     protected int end;
 
 

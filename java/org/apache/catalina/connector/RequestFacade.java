@@ -741,11 +741,13 @@ public class RequestFacade implements HttpServletRequest {
     @Override
     public String getMethod() {
 
+        // 你不正常
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
         }
 
+        // 调用 connector.Request
         return request.getMethod();
     }
 

@@ -30,26 +30,23 @@ import org.xml.sax.Attributes;
  */
 public class SetContextPropertiesRule extends Rule {
 
-
     // ----------------------------------------------------------- Constructors
-
 
     // ----------------------------------------------------- Instance Variables
 
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Handle the beginning of an XML element.
+     * <p>
+     * 处理 XML 元素的开始
      *
      * @param attributes The attributes of this element
-     *
-     * @exception Exception if a processing error occurs
+     * @throws Exception if a processing error occurs
      */
     @Override
     public void begin(String namespace, String nameX, Attributes attributes)
-        throws Exception {
+            throws Exception {
 
         for (int i = 0; i < attributes.getLength(); i++) {
             String name = attributes.getLocalName(i);
@@ -70,6 +67,5 @@ public class SetContextPropertiesRule extends Rule {
         }
 
     }
-
 
 }
