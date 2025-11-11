@@ -464,7 +464,10 @@ public class Tomcat {
      * @throws LifecycleException Start error
      */
     public void start() throws LifecycleException {
+        // 或者叫 ensureServer，确保 server 创建完毕
         getServer();
+
+        // 或者叫 ensureConnector，确保 Connector 创建完毕
         getConnector();
         server.start();
     }
@@ -602,13 +605,18 @@ public class Tomcat {
     public Engine getEngine() {
         if(engine == null ) {
             getServer();
+            // 创建了一个 Engine
             engine = new StandardEngine();
             engine.setName( "Tomcat" );
+            // 默认的 host 是 localhost
             engine.setDefaultHost(hostname);
             if (defaultRealm == null) {
                 initSimpleAuth();
             }
             engine.setRealm(defaultRealm);
+
+
+            // 最后，将 engine 设置到 service 里
             service.setContainer(engine);
         }
         return engine;
