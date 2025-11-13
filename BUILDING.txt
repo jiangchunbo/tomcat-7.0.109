@@ -142,9 +142,13 @@ each release package has the appropriate line-endings.
  1. The build is controlled by creating a ${tomcat.source}/build.properties
     file.
 
+    构建是通过创建 build.properties 控制的
+
     It is recommended to always create the file, because of unfortunate
     default value of base.path property. You may start with the following
     content for the file:
+
+    总是建议创建这个文件，因为默认值是不满足的。
 
         # ----- Default Base Path for Dependent Packages -----
         # Replace this path with the directory path where dependencies binaries

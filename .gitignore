@@ -46,3 +46,4 @@ modules/jdbc-pool/bin
 modules/jdbc-pool/includes
 webapps/docs/jdbc-pool.xml
 tomcat-build-libs/
+target/

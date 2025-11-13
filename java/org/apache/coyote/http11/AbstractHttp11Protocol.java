@@ -427,7 +427,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // Common configuration required for all new HTTP11 processors
     protected void configureProcessor(AbstractHttp11Processor<S> processor) {
         processor.setAdapter(getAdapter());
+
+        // 最大处理多少个 http 请求
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
+
+        // keep alive 超时
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
         processor.setDisableUploadTimeout(getDisableUploadTimeout());

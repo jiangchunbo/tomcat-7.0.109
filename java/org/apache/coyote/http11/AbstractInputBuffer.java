@@ -28,7 +28,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractInputBuffer<S> implements InputBuffer{
+public abstract class AbstractInputBuffer<S> implements InputBuffer {
 
     /**
      * The string manager for this package.
@@ -40,42 +40,39 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     protected Request request;
 
-
     /**
      * Headers of the associated request.
      */
     protected MimeHeaders headers;
-
 
     /**
      * State.
      */
     protected boolean parsingHeader;
 
-
     /**
      * Swallow input ? (in the case of an expectation)
+     * <p>
+     * 是否吞掉输入。在处理错误或异常场景时，设置为 true，会读取并丢弃后续输入
+     * <p>
+     * 就 endRequest 这个地方用字段判断了一下
      */
     protected boolean swallowInput;
-
 
     /**
      * Pointer to the current read buffer.
      */
     protected byte[] buf;
 
-
     /**
      * Last valid byte.
      */
     protected int lastValid;
 
-
     /**
      * Position in the buffer.
      */
     protected int pos;
-
 
     /**
      * Pos of the end of the header in the buffer, which is also the
@@ -83,12 +80,10 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     protected int end;
 
-
     /**
      * Underlying input buffer.
      */
     protected InputBuffer inputStreamInputBuffer;
-
 
     /**
      * Filter library.
@@ -96,18 +91,15 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     protected InputFilter[] filterLibrary;
 
-
     /**
      * Active filters (in order).
      */
     protected InputFilter[] activeFilters;
 
-
     /**
      * Index of the last active filter.
      */
     protected int lastActiveFilter;
-
 
     /**
      * Do HTTP headers with illegal names and/or values cause the request to be
@@ -116,11 +108,11 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     protected boolean rejectIllegalHeaderName;
 
-
     protected HttpParser httpParser;
-    protected byte prevChr = 0;
-    protected byte chr = 0;
 
+    protected byte prevChr = 0;
+
+    protected byte chr = 0;
 
     // ------------------------------------------------------------- Properties
 
@@ -132,7 +124,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         // FIXME: Check for null ?
 
         InputFilter[] newFilterLibrary =
-            new InputFilter[filterLibrary.length + 1];
+                new InputFilter[filterLibrary.length + 1];
         for (int i = 0; i < filterLibrary.length; i++) {
             newFilterLibrary[i] = filterLibrary[i];
         }
@@ -143,7 +135,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     }
 
-
     /**
      * Get filters.
      */
@@ -152,7 +143,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         return filterLibrary;
 
     }
-
 
     /**
      * Add an input filter to the filter library.
@@ -175,14 +165,12 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     }
 
-
     /**
      * Set the swallow input flag.
      */
     public void setSwallowInput(boolean swallowInput) {
         this.swallowInput = swallowInput;
     }
-
 
     protected String parseInvalid(int startPos, byte[] buffer) {
         // Look for the next space
@@ -198,24 +186,21 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         return result;
     }
 
-
     /**
      * Implementations are expected to call {@link Request#setStartTime(long)}
      * as soon as the first byte is read from the request.
      */
     public abstract boolean parseRequestLine(boolean useAvailableDataOnly)
-        throws IOException;
+            throws IOException;
 
     public abstract boolean parseHeaders() throws IOException;
 
     protected abstract boolean fill(boolean block) throws IOException;
 
     protected abstract void init(SocketWrapper<S> socketWrapper,
-            AbstractEndpoint<S> endpoint) throws IOException;
-
+                                 AbstractEndpoint<S> endpoint) throws IOException;
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Recycle the input buffer. This should be called when closing the
@@ -239,7 +224,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         parsingHeader = true;
         swallowInput = true;
     }
-
 
     /**
      * End processing of current HTTP request.
@@ -271,7 +255,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         swallowInput = true;
     }
 
-
     /**
      * End request (consumes leftover bytes).
      *
@@ -279,12 +262,12 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     public void endRequest() throws IOException {
 
+        // 如果吞掉输入
         if (swallowInput && (lastActiveFilter != -1)) {
             int extraBytes = (int) activeFilters[lastActiveFilter].end();
             pos = pos - extraBytes;
         }
     }
-
 
     /**
      * Available bytes in the buffers (note that due to encoding, this may not
@@ -301,7 +284,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         return result;
     }
 
-
     // ---------------------------------------------------- InputBuffer Methods
 
     /**
@@ -309,12 +291,13 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     @Override
     public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
+            throws IOException {
 
         if (lastActiveFilter == -1)
             return inputStreamInputBuffer.doRead(chunk, req);
         else
-            return activeFilters[lastActiveFilter].doRead(chunk,req);
+            return activeFilters[lastActiveFilter].doRead(chunk, req);
 
     }
+
 }

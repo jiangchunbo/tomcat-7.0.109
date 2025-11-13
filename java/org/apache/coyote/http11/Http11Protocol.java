@@ -30,7 +30,6 @@ import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketWrapper;
 
-
 /**
  * Abstract the protocol implementation, including threading, etc.
  * Processor is single threaded and specific to stream-based protocols,
@@ -41,22 +40,20 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
-
     private static final org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
+            = org.apache.juli.logging.LogFactory.getLog(Http11Protocol.class);
 
     @Override
-    protected Log getLog() { return log; }
-
+    protected Log getLog() {
+        return log;
+    }
 
     @Override
     protected AbstractEndpoint.Handler getHandler() {
         return cHandler;
     }
 
-
     // ------------------------------------------------------------ Constructor
-
 
     public Http11Protocol() {
         endpoint = new JIoEndpoint();
@@ -67,19 +64,19 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
-
     // ----------------------------------------------------------------- Fields
 
     protected Http11ConnectionHandler cHandler;
-
 
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
     private int disableKeepAlivePercentage = 75;
+
     public int getDisableKeepAlivePercentage() {
         return disableKeepAlivePercentage;
     }
+
     public void setDisableKeepAlivePercentage(int disableKeepAlivePercentage) {
         if (disableKeepAlivePercentage < 0) {
             this.disableKeepAlivePercentage = 0;
@@ -96,7 +93,6 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
     protected String getNamePrefix() {
         return ("http-bio");
     }
-
 
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
@@ -128,22 +124,22 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
          * Expected to be used by the handler once the processor is no longer
          * required.
          *
-         * @param socket            Not used in BIO
+         * @param socket          Not used in BIO
          * @param processor
-         * @param isSocketClosing   Not used in HTTP
-         * @param addToPoller       Not used in BIO
+         * @param isSocketClosing Not used in HTTP
+         * @param addToPoller     Not used in BIO
          */
         @Override
         public void release(SocketWrapper<Socket> socket,
-                Processor<Socket> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+                            Processor<Socket> processor, boolean isSocketClosing,
+                            boolean addToPoller) {
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
         }
 
         @Override
         protected void initSsl(SocketWrapper<Socket> socket,
-                Processor<Socket> processor) {
+                               Processor<Socket> processor) {
             if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
                 processor.setSslSupport(
                         proto.sslImplementation.getSSLSupport(
@@ -156,16 +152,19 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
         @Override
         protected void longPoll(SocketWrapper<Socket> socket,
-                Processor<Socket> processor) {
+                                Processor<Socket> processor) {
             // NO-OP
         }
 
         @Override
         protected Http11Processor createProcessor() {
             Http11Processor processor = new Http11Processor(
-                    proto.getMaxHttpHeaderSize(), proto.getRejectIllegalHeader(),
-                    (JIoEndpoint)proto.endpoint, proto.getMaxTrailerSize(),
-                    proto.getAllowedTrailerHeadersAsSet(), proto.getMaxExtensionSize(),
+                    proto.getMaxHttpHeaderSize(),       // 最大 http 头大小
+                    proto.getRejectIllegalHeader(),     //
+                    (JIoEndpoint) proto.endpoint,       //
+                    proto.getMaxTrailerSize(),          //
+                    proto.getAllowedTrailerHeadersAsSet(),
+                    proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize(), proto.getRelaxedPathChars(),
                     proto.getRelaxedQueryChars());
             proto.configureProcessor(processor);
@@ -175,7 +174,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
         }
 
         /**
-         * @deprecated  Will be removed in Tomcat 8.0.x.
+         * @deprecated Will be removed in Tomcat 8.0.x.
          */
         @Deprecated
         @Override
@@ -195,5 +194,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
             return new BioProcessor(socket, httpUpgradeProcessor,
                     proto.getUpgradeAsyncWriteBufferSize());
         }
+
     }
+
 }

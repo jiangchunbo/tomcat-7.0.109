@@ -602,7 +602,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 return SocketState.CLOSED;
             }
 
+            // 获取 socket 对应的处理器
             Processor<S> processor = connections.get(socket);
+
+            // 如果 disconnect 断连了，而且处理器也没了，socket 关闭退出
             if (status == SocketStatus.DISCONNECT && processor == null) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
@@ -613,9 +616,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             ContainerThreadMarker.markAsContainerThread();
 
             try {
+                // 循环处理器
                 if (processor == null) {
                     processor = recycledProcessors.poll();
                 }
+
+                // 创建处理器
                 if (processor == null) {
                     processor = createProcessor();
                 }

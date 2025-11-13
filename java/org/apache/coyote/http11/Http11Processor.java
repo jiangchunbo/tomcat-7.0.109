@@ -127,11 +127,17 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         // Only calculate a thread ratio when both are >0 to ensure we get a
         // sensible result
         int maxThreads, threadsBusy;
+
+        // 获得最大线程数，再获得当前忙碌的线程数
         if ((maxThreads = endpoint.getMaxThreadsWithExecutor()) > 0
                 && (threadsBusy = endpoint.getCurrentThreadsBusy()) > 0) {
+
+            // 得到一个忙碌率 [1-100]
             threadRatio = (threadsBusy * 100) / maxThreads;
         }
+
         // Disable keep-alive if we are running low on threads
+        // 如果忙碌率较大，需要关掉 keep alive
         if (threadRatio > getDisableKeepAlivePercentage()) {
             return true;
         }
