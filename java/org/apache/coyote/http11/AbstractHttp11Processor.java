@@ -734,6 +734,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     /**
      * Initialize standard input and output filters.
+     * <p>
+     * 初始化标准的 input 和 output 过滤器 (或者叫 InputFilter OutputFilter 管道)
      */
     protected void initializeFilters(int maxTrailerSize, Set<String> allowedTrailerHeaders,
                                      int maxExtensionSize, int maxSwallowSize) {
@@ -1126,7 +1128,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
 
             // maxKeepAliveRequests 其实就是说，最多一个连接可以请求多少次
-
 
             // <<<<<<<<<<<<<< 默认是长连接 但是是否需要关闭
             // 如果是 1，其实也就不是长连接，直接关闭

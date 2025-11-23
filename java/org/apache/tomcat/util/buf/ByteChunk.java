@@ -410,6 +410,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     public int substract(byte dest[], int off, int len) throws IOException {
+        // 检查有没有数据可读 (读取到头?)
         if (checkEof()) {
             return -1;
         }
@@ -418,19 +419,22 @@ public final class ByteChunk extends AbstractChunk {
             n = getLength();
         }
         System.arraycopy(buff, start, dest, off, n);
+
+        // 读取了一些数据，计算下一次读取的开始位置
         start += n;
         return n;
     }
 
 
     private boolean checkEof() throws IOException {
+        // end - start == 0 表示缓冲区已经没有数据，都读完了
         if ((end - start) == 0) {
-            if (in == null) {
-                return true;
+            if (in == null) { // 没有再往里读的通道
+                return true; // 直接判定为 EOF
             }
-            int n = in.realReadBytes(buff, 0, buff.length);
-            if (n < 0) {
-                return true;
+            int n = in.realReadBytes(buff, 0, buff.length); // 试图再读取
+            if (n < 0) { // 读不到更多
+                return true; // 视为 EOF
             }
         }
         return false;

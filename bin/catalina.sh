@@ -307,13 +307,18 @@ fi
 # Make the umask available when using the org.apache.catalina.security.SecurityListener
 JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
 
+
+# -z 判断字符串是否是 0 [zero?] -> 显式要求使用 nohup
 if [ -z "$USE_NOHUP" ]; then
+    # 惠普操作系统
     if $hpux; then
         USE_NOHUP="true"
     else
         USE_NOHUP="false"
     fi
 fi
+
+# 赋值 _NOHUP
 unset _NOHUP
 if [ "$USE_NOHUP" = "true" ]; then
     _NOHUP="nohup"

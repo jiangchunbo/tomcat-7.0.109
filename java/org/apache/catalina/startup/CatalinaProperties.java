@@ -28,7 +28,6 @@ import java.util.Properties;
 
 import org.apache.catalina.Globals;
 
-
 /**
  * Utility class to read the bootstrap Catalina configuration.
  *
@@ -37,24 +36,18 @@ import org.apache.catalina.Globals;
 
 public class CatalinaProperties {
 
-
     // ------------------------------------------------------- Static Variables
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( CatalinaProperties.class );
+    private static final org.apache.juli.logging.Log log =
+            org.apache.juli.logging.LogFactory.getLog(CatalinaProperties.class);
 
     private static Properties properties = null;
 
-
     static {
-
         loadProperties();
-
     }
 
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Return specified property value.
@@ -65,11 +58,10 @@ public class CatalinaProperties {
 
     }
 
-
     /**
      * Return specified property value.
      *
-     * @deprecated  Unused - will be removed in 8.0.x
+     * @deprecated Unused - will be removed in 8.0.x
      */
     @Deprecated
     public static String getProperty(String name, String defaultValue) {
@@ -78,9 +70,7 @@ public class CatalinaProperties {
 
     }
 
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Load properties.
@@ -90,7 +80,9 @@ public class CatalinaProperties {
         InputStream is = null;
         Throwable error = null;
 
+        // 1) 优先获取系统属性 catalina.config 表示的 URL
         try {
+
             String configUrl = getConfigUrl();
             if (configUrl != null) {
                 is = (new URL(configUrl)).openStream();
@@ -99,6 +91,7 @@ public class CatalinaProperties {
             handleThrowable(t);
         }
 
+        // 2) 其次，获取 catalina.base 目录下面的 conf/catalina.properties
         if (is == null) {
             try {
                 File home = new File(getCatalinaBase());
@@ -110,15 +103,17 @@ public class CatalinaProperties {
             }
         }
 
+        // 3) 再其次，获取类路径 /org/apache/catalina/startup/catalina.properties
         if (is == null) {
             try {
                 is = CatalinaProperties.class.getResourceAsStream
-                    ("/org/apache/catalina/startup/catalina.properties");
+                        ("/org/apache/catalina/startup/catalina.properties");
             } catch (Throwable t) {
                 handleThrowable(t);
             }
         }
 
+        // 载入 Properties
         if (is != null) {
             try {
                 properties = new Properties();
@@ -126,9 +121,7 @@ public class CatalinaProperties {
             } catch (Throwable t) {
                 handleThrowable(t);
                 error = t;
-            }
-            finally
-            {
+            } finally {
                 try {
                     is.close();
                 } catch (IOException ioe) {
@@ -137,11 +130,12 @@ public class CatalinaProperties {
             }
         }
 
+        // 如果上面 3 个地方都没有获取 is，或者加载属性文件时有错误 -> 只是 warn 一下，并创建了一个空的 properties
         if ((is == null) || (error != null)) {
             // Do something
             log.warn("Failed to load catalina.properties", error);
             // That's fine - we have reasonable defaults.
-            properties=new Properties();
+            properties = new Properties();
         }
 
         // Register the properties as system properties
@@ -156,15 +150,13 @@ public class CatalinaProperties {
 
     }
 
-
     /**
      * Get the value of the catalina.home environment variable.
      */
     private static String getCatalinaHome() {
         return System.getProperty(Globals.CATALINA_HOME_PROP,
-                                  System.getProperty("user.dir"));
+                System.getProperty("user.dir"));
     }
-
 
     /**
      * Get the value of the catalina.base environment variable.
@@ -172,7 +164,6 @@ public class CatalinaProperties {
     private static String getCatalinaBase() {
         return System.getProperty(Globals.CATALINA_BASE_PROP, getCatalinaHome());
     }
-
 
     /**
      * Get the value of the configuration URL.

@@ -33,6 +33,10 @@ import org.apache.tomcat.util.res.StringManager;
  * Base implementation of the {@link Lifecycle} interface that implements the
  * state transition rules for {@link Lifecycle#start()} and
  * {@link Lifecycle#stop()}
+ * <p>
+ * Lifecycle 接口的基础实现类，实现了一些状态流转
+ * <p>
+ * Tomcat 4 个 Container 都因为实现了这个类所以拥有生命周期的能力
  */
 public abstract class LifecycleBase implements Lifecycle {
 
@@ -40,21 +44,17 @@ public abstract class LifecycleBase implements Lifecycle {
 
     private static final StringManager sm = StringManager.getManager(LifecycleBase.class);
 
-
     /**
      * The list of registered LifecycleListeners for event notifications.
      */
     private final List<LifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<LifecycleListener>();
-
 
     /**
      * The current state of the source component.
      */
     private volatile LifecycleState state = LifecycleState.NEW;
 
-
     private boolean throwOnFailure = true;
-
 
     /**
      * Will a {@link LifecycleException} thrown by a sub-class during
@@ -63,12 +63,11 @@ public abstract class LifecycleBase implements Lifecycle {
      * the caller to handle or will it be logged instead?
      *
      * @return {@code true} if the exception will be re-thrown, otherwise
-     *         {@code false}
+     * {@code false}
      */
     public boolean getThrowOnFailure() {
         return throwOnFailure;
     }
-
 
     /**
      * Configure if a {@link LifecycleException} thrown by a sub-class during
@@ -83,7 +82,6 @@ public abstract class LifecycleBase implements Lifecycle {
         this.throwOnFailure = throwOnFailure;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -91,7 +89,6 @@ public abstract class LifecycleBase implements Lifecycle {
     public void addLifecycleListener(LifecycleListener listener) {
         lifecycleListeners.add(listener);
     }
-
 
     /**
      * {@inheritDoc}
@@ -101,7 +98,6 @@ public abstract class LifecycleBase implements Lifecycle {
         return lifecycleListeners.toArray(new LifecycleListener[0]);
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -110,12 +106,11 @@ public abstract class LifecycleBase implements Lifecycle {
         lifecycleListeners.remove(listener);
     }
 
-
     /**
      * Allow sub classes to fire {@link Lifecycle} events.
      *
-     * @param type  Event type
-     * @param data  Data associated with event.
+     * @param type Event type
+     * @param data Data associated with event.
      */
     protected void fireLifecycleEvent(String type, Object data) {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
@@ -123,7 +118,6 @@ public abstract class LifecycleBase implements Lifecycle {
             listener.lifecycleEvent(event);
         }
     }
-
 
     @Override
     public final synchronized void init() throws LifecycleException {
@@ -146,7 +140,6 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
     /**
      * Sub-classes implement this method to perform any instance initialisation
      * required.
@@ -154,7 +147,6 @@ public abstract class LifecycleBase implements Lifecycle {
      * @throws LifecycleException If the initialisation fails
      */
     protected abstract void initInternal() throws LifecycleException;
-
 
     /**
      * {@inheritDoc}
@@ -205,12 +197,11 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
     /**
      * Sub-classes must ensure that the state is changed to
      * {@link LifecycleState#STARTING} during the execution of this method.
      * Changing state will trigger the {@link Lifecycle#START_EVENT} event.
-     *
+     * <p>
      * If a component fails to start it may either throw a
      * {@link LifecycleException} which will cause it's parent to fail to start
      * or it can place itself in the error state in which case {@link #stop()}
@@ -220,7 +211,6 @@ public abstract class LifecycleBase implements Lifecycle {
      * @throws LifecycleException Start error occurred
      */
     protected abstract void startInternal() throws LifecycleException;
-
 
     /**
      * {@inheritDoc}
@@ -280,7 +270,6 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
     /**
      * Sub-classes must ensure that the state is changed to
      * {@link LifecycleState#STOPPING} during the execution of this method.
@@ -289,7 +278,6 @@ public abstract class LifecycleBase implements Lifecycle {
      * @throws LifecycleException Stop error occurred
      */
     protected abstract void stopInternal() throws LifecycleException;
-
 
     @Override
     public final synchronized void destroy() throws LifecycleException {
@@ -331,7 +319,6 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
     /**
      * Sub-classes implement this method to perform any instance destruction
      * required.
@@ -339,7 +326,6 @@ public abstract class LifecycleBase implements Lifecycle {
      * @throws LifecycleException If the destruction fails
      */
     protected abstract void destroyInternal() throws LifecycleException;
-
 
     /**
      * {@inheritDoc}
@@ -349,7 +335,6 @@ public abstract class LifecycleBase implements Lifecycle {
         return state;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -357,7 +342,6 @@ public abstract class LifecycleBase implements Lifecycle {
     public String getStateName() {
         return getState().toString();
     }
-
 
     /**
      * Provides a mechanism for sub-classes to update the component state.
@@ -371,7 +355,6 @@ public abstract class LifecycleBase implements Lifecycle {
     protected synchronized void setState(LifecycleState state) throws LifecycleException {
         setStateInternal(state, null, true);
     }
-
 
     /**
      * Provides a mechanism for sub-classes to update the component state.
@@ -387,7 +370,6 @@ public abstract class LifecycleBase implements Lifecycle {
             throws LifecycleException {
         setStateInternal(state, data, true);
     }
-
 
     private synchronized void setStateInternal(LifecycleState state, Object data, boolean check)
             throws LifecycleException {
@@ -430,12 +412,10 @@ public abstract class LifecycleBase implements Lifecycle {
         }
     }
 
-
     private void invalidTransition(String type) throws LifecycleException {
         String msg = sm.getString("lifecycleBase.invalidTransition", type, toString(), state);
         throw new LifecycleException(msg);
     }
-
 
     private void handleSubClassException(Throwable t, String key, Object... args) throws LifecycleException {
         setStateInternal(LifecycleState.FAILED, null, false);
@@ -450,4 +430,5 @@ public abstract class LifecycleBase implements Lifecycle {
             log.error(msg, t);
         }
     }
+
 }

@@ -89,6 +89,7 @@ public final class Bootstrap {
     private ClassLoader createClassLoader(String name, ClassLoader parent)
             throws Exception {
 
+        // 获取 ${name} 类加载器的类路径，例如 common.loader
         String value = CatalinaProperties.getProperty(name + ".loader");
         if ((value == null) || (value.equals("")))
             return parent;
@@ -144,19 +145,28 @@ public final class Bootstrap {
             StringBuilder builder = new StringBuilder();
             int pos_end = -1;
             while (pos_start >= 0) {
+                // 拼接上一个 } 到下一个 ${ 之间的字符串
                 builder.append(str, pos_end + 1, pos_start);
+
+                // 寻找 }，位置起码是从 pos_start + 2 开始，跳过 ${ 两个字符
                 pos_end = str.indexOf('}', pos_start + 2);
                 if (pos_end < 0) {
                     pos_end = pos_start - 1;
                     break;
                 }
+
+                // 将 ${} 解析成属性并拼接
                 String propName = str.substring(pos_start + 2, pos_end);
                 String replacement;
                 if (propName.length() == 0) {
                     replacement = null;
-                } else if (Globals.CATALINA_HOME_PROP.equals(propName)) {
+                }
+                // 处理 ${catalina.home} 属性
+                else if (Globals.CATALINA_HOME_PROP.equals(propName)) {
                     replacement = getCatalinaHome();
-                } else if (Globals.CATALINA_BASE_PROP.equals(propName)) {
+                }
+                // 处理 ${catalina.base} 属性
+                else if (Globals.CATALINA_BASE_PROP.equals(propName)) {
                     replacement = getCatalinaBase();
                 } else {
                     replacement = System.getProperty(propName);
@@ -230,9 +240,10 @@ public final class Bootstrap {
     private void load(String[] arguments) throws Exception {
 
         // Call the load() method
+        // 方法的名字就叫 load
         String methodName = "load";
         Object param[];
-        Class<?> paramTypes[];
+        Class<?> paramTypes[]; // 用于反射寻找 Method
         if (arguments == null || arguments.length == 0) {
             paramTypes = null;
             param = null;

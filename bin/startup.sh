@@ -26,18 +26,31 @@ OS400*) os400=true;;
 esac
 
 # resolve links - $0 may be a softlink
+# 解析 link - $0 可能是一个软连接
+
+# 假设脚本名一开始放在 $PRG
 PRG="$0"
 
+# -h 用来判断文件是否为符号链接 soft link/symbolic link
+# -d 只列出目录，而不会列出目录里面的文件等
 while [ -h "$PRG" ] ; do
   ls=`ls -ld "$PRG"`
+
+  # 使用正则抽取 -> 右边真正指向的路径
   link=`expr "$ls" : '.*-> \(.*\)$'`
+
+  # 如果 link 是绝对路径 [/ 开头]
   if expr "$link" : '/.*' > /dev/null; then
     PRG="$link"
+  # 否则就要根据当前目录，拼接上相对路径
   else
     PRG=`dirname "$PRG"`/"$link"
   fi
+
+  # 循环直到不再是符号链接
 done
 
+# 获取目录 -> 下面从这个目录里面执行 catalina.sh
 PRGDIR=`dirname "$PRG"`
 EXECUTABLE=catalina.sh
 

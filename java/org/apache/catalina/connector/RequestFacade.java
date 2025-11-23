@@ -354,7 +354,9 @@ public class RequestFacade implements HttpServletRequest {
         return request.getContentType();
     }
 
-
+    /**
+     * 开发者获取 InputStream 的入口方法，委托给 Request
+     */
     @Override
     public ServletInputStream getInputStream() throws IOException {
 
@@ -363,6 +365,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
+        // 调用目标对象 Request 方法
         return request.getInputStream();
     }
 

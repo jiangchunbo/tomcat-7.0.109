@@ -25,11 +25,13 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Input filter interface.
+ * <p>
+ * Tomcat 的感情球体读取链是一条 InputFilter 管道。
+ * 每个 InputFilter 负责识别并处理一种特定的传输方式。
  *
  * @author Remy Maucherat
  */
 public interface InputFilter extends InputBuffer {
-
 
     /**
      * Read bytes.
@@ -38,8 +40,7 @@ public interface InputFilter extends InputBuffer {
      */
     @Override
     public int doRead(ByteChunk chunk, Request unused)
-        throws IOException;
-
+            throws IOException;
 
     /**
      * Some filters need additional parameters from the request. All the
@@ -48,24 +49,20 @@ public interface InputFilter extends InputBuffer {
      */
     public void setRequest(Request request);
 
-
     /**
      * Make the filter ready to process the next request.
      */
     public void recycle();
-
 
     /**
      * Get the name of the encoding handled by this filter.
      */
     public ByteChunk getEncodingName();
 
-
     /**
      * Set the next buffer in the filter pipeline.
      */
     public void setBuffer(InputBuffer buffer);
-
 
     /**
      * End the current request.
@@ -76,4 +73,5 @@ public interface InputFilter extends InputBuffer {
      * an error happens, an IOException should be thrown instead).
      */
     public long end() throws IOException;
+
 }

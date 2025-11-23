@@ -34,6 +34,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
     public static final int ARRAY_MAX_SIZE = Integer.MAX_VALUE - 8;
 
     private int hashCode = 0;
+
     protected boolean hasHashCode = false;
 
     protected boolean isSet;
@@ -42,14 +43,17 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     /**
      * 表示某一段字节数组中一个字节块的 start
+     * <p>
+     * 缓冲区中下一次要读取的字节位置
      */
     protected int start;
 
     /**
      * 表示某一段字节数组中一个字节块的 end
+     * <p>
+     * 缓冲区最后一个可用字节之后的位置
      */
     protected int end;
-
 
     /**
      * Maximum amount of data in this buffer. If -1 or not set, the buffer will
@@ -63,11 +67,9 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         this.limit = limit;
     }
 
-
     public int getLimit() {
         return limit;
     }
-
 
     protected int getLimitInternal() {
         if (limit > 0) {
@@ -77,7 +79,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         }
     }
 
-
     /**
      * @return the start position of the data in the buffer
      */
@@ -85,23 +86,19 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         return start;
     }
 
-
     public int getEnd() {
         return end;
     }
 
-
     public void setEnd(int i) {
         end = i;
     }
-
 
     // TODO: Deprecate offset and use start
 
     public int getOffset() {
         return start;
     }
-
 
     public void setOffset(int off) {
         if (end < off) {
@@ -110,14 +107,12 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         start = off;
     }
 
-
     /**
      * @return the length of the data in the buffer
      */
     public int getLength() {
         return end - start;
     }
-
 
     public boolean isNull() {
         if (end > 0) {
@@ -126,20 +121,20 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         return !isSet;
     }
 
-
     public int indexOf(String src, int srcOff, int srcLen, int myOff) {
         char first = src.charAt(srcOff);
 
         // Look for first char
         int srcEnd = srcOff + srcLen;
 
-        mainLoop: for (int i = myOff + start; i <= (end - srcLen); i++) {
+        mainLoop:
+        for (int i = myOff + start; i <= (end - srcLen); i++) {
             if (getBufferElement(i) != first) {
                 continue;
             }
             // found first char, now look for a match
             int myPos = i + 1;
-            for (int srcPos = srcOff + 1; srcPos < srcEnd;) {
+            for (int srcPos = srcOff + 1; srcPos < srcEnd; ) {
                 if (getBufferElement(myPos++) != src.charAt(srcPos++)) {
                     continue mainLoop;
                 }
@@ -148,7 +143,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         }
         return -1;
     }
-
 
     /**
      * Resets the chunk to an uninitialized state.
@@ -159,7 +153,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         start = 0;
         end = 0;
     }
-
 
     @Override
     public int hashCode() {
@@ -174,7 +167,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         return code;
     }
 
-
     public int hash() {
         int code = 0;
         for (int i = start; i < end; i++) {
@@ -183,6 +175,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         return code;
     }
 
-
     protected abstract int getBufferElement(int index);
+
 }

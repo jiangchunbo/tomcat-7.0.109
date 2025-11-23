@@ -1114,7 +1114,10 @@ public class Request implements HttpServletRequest {
             throw new IllegalStateException(sm.getString("coyoteRequest.getInputStream.ise"));
         }
 
+        // 标记使用了 InputStream ?
         usingInputStream = true;
+
+        // 惰性创建 CoyoteInputStream
         if (inputStream == null) {
             inputStream = new CoyoteInputStream(inputBuffer);
         }
