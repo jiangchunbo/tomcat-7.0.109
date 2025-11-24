@@ -29,49 +29,47 @@ import java.util.jar.Manifest;
  */
 public class ResourceEntry {
 
-
     /**
      * The "last modified" time of the origin file at the time this class
      * was loaded, in milliseconds since the epoch.
      */
     public long lastModified = -1;
 
-
     /**
      * Binary content of the resource.
+     * <p>
+     * class 文件内容
      */
     public byte[] binaryContent = null;
 
-
     /**
      * Loaded class.
+     * <p>
+     * 加载的类
      */
     public volatile Class<?> loadedClass = null;
 
-
     /**
      * URL source from where the object was loaded.
+     * <p>
+     * 加载的源
      */
     public URL source = null;
-
 
     /**
      * URL of the codebase from where the object was loaded.
      */
     public URL codeBase = null;
 
-
     /**
      * Manifest (if the resource was loaded from a JAR).
      */
     public Manifest manifest = null;
 
-
     /**
      * Certificates (if the resource was loaded from a JAR).
      */
     public Certificate[] certificates = null;
-
 
 }
 

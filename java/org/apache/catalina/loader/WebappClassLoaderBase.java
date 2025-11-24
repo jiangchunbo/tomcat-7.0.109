@@ -264,8 +264,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         this.parent = p;
 
+        // String 的类加载器应该就是 bootstrap 吧
         ClassLoader j = String.class.getClassLoader();
         if (j == null) {
+            // j 一般就是空，所以获取的是 AppClassLoader
             j = getSystemClassLoader();
             while (j.getParent() != null) {
                 j = j.getParent();
@@ -1840,6 +1842,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (0) Check our previously loaded local class cache
+            //     检查 tomcat 自己的缓存
             clazz = findLoadedClass0(name);
             if (clazz != null) {
                 if (log.isDebugEnabled())
@@ -1850,6 +1853,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (0.1) Check our previously loaded class cache
+            //       还是检查缓存，但是从 jvm 内检查
             clazz = findLoadedClass(name);
             if (clazz != null) {
                 if (log.isDebugEnabled())
@@ -1861,6 +1865,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
             // (0.2) Try loading the class with the system class loader, to prevent
             //       the webapp from overriding J2SE classes
+            //       使用系统类加载器加载类，防止 webapp 覆盖了 j2se 的类
             try {
                 clazz = j2seClassLoader.loadClass(name);
                 if (clazz != null) {
@@ -3716,6 +3721,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * @param name Name of the resource to return
      */
     protected Class<?> findLoadedClass0(String name) {
+        // 将 name 转换为 com/example/Hello 形式
         String path = binaryNameToPath(name, true);
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
