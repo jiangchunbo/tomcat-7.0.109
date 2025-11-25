@@ -1316,6 +1316,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         // (1) Permission to define this class when using a SecurityManager
+        // 使用安全管理器检查权限，不重要，不用看
         if (securityManager != null) {
             int i = name.lastIndexOf('.');
             if (i >= 0) {
@@ -1337,6 +1338,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         try {
             if (log.isTraceEnabled())
                 log.trace("      findClassInternal(" + name + ")");
+
+            // 是否使用外部的仓库，以及是否优先使用外部仓库
             if (hasExternalRepositories && searchExternalFirst) {
                 try {
                     clazz = super.findClass(name);
@@ -1352,6 +1355,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     throw e;
                 }
             }
+
+            // 执行内部的类加载
             if ((clazz == null)) {
                 try {
                     clazz = findClassInternal(name);
@@ -1867,6 +1872,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (3) Delegate to parent unconditionally
+            // 要不就是启用双亲委派，上面的逻辑加载类
+            // 要不就是未启用双亲委派，这个逻辑加载类
             if (!delegateLoad) {
                 if (log.isDebugEnabled())
                     log.debug("  Delegating to parent classloader at end: " + parent);
@@ -3076,6 +3083,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             throw new ClassNotFoundException(name);
 
         ResourceEntry entry = null;
+
+        // 把 name 转换为 /com/example/Hello.class 可以用于资源加载，寻找类
         String path = binaryNameToPath(name, true);
 
         if (securityManager != null) {
@@ -3237,6 +3246,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // Need to skip the leading / to find resources in JARs
         String jarEntryPath = path.substring(1);
 
+        // 虽然之前已经寻找过资源了，但是再次尝试
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
             if (manifestRequired && entry.manifest == MANIFEST_UNKNOWN) {
@@ -3545,10 +3555,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private String binaryNameToPath(String binaryName, boolean withLeadingSlash) {
         // 1 for leading '/', 6 for ".class"
         StringBuilder path = new StringBuilder(7 + binaryName.length());
+
+        // 开头是一个 '/'
         if (withLeadingSlash) {
             path.append('/');
         }
+
+        // 将 packageName 的 '.' 都转换为 '/'
         path.append(binaryName.replace('.', '/'));
+
+        // 最后添加 .class
         path.append(CLASS_FILE_SUFFIX);
         return path.toString();
     }
@@ -3619,8 +3635,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * @param name Name of the resource to return
      */
     protected Class<?> findLoadedClass0(String name) {
-        // 将 name 转换为 com/example/Hello 形式
+        // 将 name 转换为 /com/example/Hello.class 形式 [像是一个资源名字]
         String path = binaryNameToPath(name, true);
+
+        // 按照资源名字寻找资源
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
             return entry.loadedClass;
