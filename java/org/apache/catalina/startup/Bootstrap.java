@@ -72,6 +72,7 @@ public final class Bootstrap {
 
     private void initClassLoaders() {
         try {
+            // Tomcat 共享的类加载器
             commonLoader = createClassLoader("common", null);
             if (commonLoader == null) {
                 // no config file, default to this loader - we might be in a 'single' env.
@@ -89,26 +90,33 @@ public final class Bootstrap {
     private ClassLoader createClassLoader(String name, ClassLoader parent)
             throws Exception {
 
-        // 获取 ${name} 类加载器的类路径，例如 common.loader
+        // 获取 ${name} 类加载器的 classpath
         String value = CatalinaProperties.getProperty(name + ".loader");
+
+        // 如果没有配置类路径，就不创建新的类加载器，使用 parent
         if ((value == null) || (value.equals("")))
             return parent;
 
+        // 解析占位符
         value = replace(value);
 
         List<Repository> repositories = new ArrayList<Repository>();
 
+        // 使用 StringTokenizer 对字符串进行分割，分隔符是 ","
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
         while (tokenizer.hasMoreElements()) {
+            // 获取下一个 classpath
             String repository = tokenizer.nextToken().trim();
-            if (repository.length() == 0) {
+            if (repository.length() == 0) { // 字符串出现 ,, 连续的 , ?
                 continue;
             }
 
             // Check for a JAR URL repository
             try {
                 @SuppressWarnings("unused")
-                URL url = new URL(repository);
+                URL url = new URL(repository); // 只是确保 URL 是否正确，不正确则忽略
+
+                // 添加 repository
                 repositories.add(new Repository(repository, RepositoryType.URL));
                 continue;
             } catch (MalformedURLException e) {
@@ -116,17 +124,22 @@ public final class Bootstrap {
             }
 
             // Local repository
+            // 如果以 *.jar 结尾，这是一个 glob pattern
             if (repository.endsWith("*.jar")) {
-                repository = repository.substring
-                        (0, repository.length() - "*.jar".length());
+                repository = repository.substring(0, repository.length() - "*.jar".length());
                 repositories.add(new Repository(repository, RepositoryType.GLOB));
-            } else if (repository.endsWith(".jar")) {
+            }
+            // 如果以 .jar 结尾，这是一个 jar 文件
+            else if (repository.endsWith(".jar")) {
                 repositories.add(new Repository(repository, RepositoryType.JAR));
-            } else {
+            }
+            // 否则就是一个目录 ? (有点草率)
+            else {
                 repositories.add(new Repository(repository, RepositoryType.DIR));
             }
         }
 
+        // repositories 2 个元素，URL 还有另一个类型的仓库
         return ClassLoaderFactory.createClassLoader(repositories, parent);
     }
 

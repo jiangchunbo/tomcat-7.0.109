@@ -18,7 +18,6 @@
 
 package org.apache.catalina.startup;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -33,7 +32,6 @@ import java.util.Set;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
 
 /**
  * <p>Utility class for building class loaders for Catalina.  The factory
@@ -55,31 +53,28 @@ import org.apache.juli.logging.LogFactory;
 
 public final class ClassLoaderFactory {
 
-
     private static final Log log = LogFactory.getLog(ClassLoaderFactory.class);
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Create and return a new class loader, based on the configuration
      * defaults and the specified directory paths:
      *
      * @param unpacked Array of pathnames to unpacked directories that should
-     *  be added to the repositories of the class loader, or <code>null</code>
-     * for no unpacked directories to be considered
-     * @param packed Array of pathnames to directories containing JAR files
-     *  that should be added to the repositories of the class loader,
-     * or <code>null</code> for no directories of JAR files to be considered
-     * @param parent Parent class loader for the new class loader, or
-     *  <code>null</code> for the system class loader.
-     *
-     * @exception Exception if an error occurs constructing the class loader
+     *                 be added to the repositories of the class loader, or <code>null</code>
+     *                 for no unpacked directories to be considered
+     * @param packed   Array of pathnames to directories containing JAR files
+     *                 that should be added to the repositories of the class loader,
+     *                 or <code>null</code> for no directories of JAR files to be considered
+     * @param parent   Parent class loader for the new class loader, or
+     *                 <code>null</code> for the system class loader.
+     * @throws Exception if an error occurs constructing the class loader
      */
     public static ClassLoader createClassLoader(File unpacked[],
                                                 File packed[],
                                                 final ClassLoader parent)
-        throws Exception {
+            throws Exception {
 
         if (log.isDebugEnabled())
             log.debug("Creating new class loader");
@@ -142,7 +137,6 @@ public final class ClassLoaderFactory {
                 });
     }
 
-
     /**
      * Create and return a new class loader, based on the configuration
      * defaults and the specified directory paths:
@@ -150,29 +144,32 @@ public final class ClassLoaderFactory {
      * @param repositories List of class directories, jar files, jar directories
      *                     or URLS that should be added to the repositories of
      *                     the class loader.
-     * @param parent Parent class loader for the new class loader, or
-     *  <code>null</code> for the system class loader.
-     *
-     * @exception Exception if an error occurs constructing the class loader
+     * @param parent       Parent class loader for the new class loader, or
+     *                     <code>null</code> for the system class loader.
+     * @throws Exception if an error occurs constructing the class loader
      */
     public static ClassLoader createClassLoader(List<Repository> repositories,
                                                 final ClassLoader parent)
-        throws Exception {
+            throws Exception {
 
         if (log.isDebugEnabled())
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
+        // 这个 Set 存储 class loader 的 classpath
         Set<URL> set = new LinkedHashSet<URL>();
 
         if (repositories != null) {
-            for (Repository repository : repositories)  {
+            for (Repository repository : repositories) {
+                // 1) 构造 URL
                 if (repository.getType() == RepositoryType.URL) {
                     URL url = buildClassLoaderUrl(repository.getLocation());
                     if (log.isDebugEnabled())
                         log.debug("  Including URL " + url);
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.DIR) {
+                }
+                // 2) 构造 File [表示目录]
+                else if (repository.getType() == RepositoryType.DIR) {
                     File directory = new File(repository.getLocation());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.DIR)) {
@@ -182,8 +179,10 @@ public final class ClassLoaderFactory {
                     if (log.isDebugEnabled())
                         log.debug("  Including directory " + url);
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.JAR) {
-                    File file=new File(repository.getLocation());
+                }
+                // 3) 构造 JAR
+                else if (repository.getType() == RepositoryType.JAR) {
+                    File file = new File(repository.getLocation());
                     file = file.getCanonicalFile();
                     if (!validateFile(file, RepositoryType.JAR)) {
                         continue;
@@ -193,14 +192,14 @@ public final class ClassLoaderFactory {
                         log.debug("  Including jar file " + url);
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.GLOB) {
-                    File directory=new File(repository.getLocation());
+                    File directory = new File(repository.getLocation());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
                     if (log.isDebugEnabled())
                         log.debug("  Including directory glob "
-                            + directory.getAbsolutePath());
+                                + directory.getAbsolutePath());
                     String filenames[] = directory.list();
                     if (filenames == null) {
                         continue;
@@ -244,7 +243,8 @@ public final class ClassLoaderFactory {
     }
 
     private static boolean validateFile(File file,
-            RepositoryType type) throws IOException {
+                                        RepositoryType type) throws IOException {
+        // 必须存在，DIR 和 GLOB 必须都是目录
         if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
             if (!file.exists() || !file.isDirectory() || !file.canRead()) {
                 String msg = "Problem with directory [" + file +
@@ -252,9 +252,9 @@ public final class ClassLoaderFactory {
                         "], isDirectory: [" + file.isDirectory() +
                         "], canRead: [" + file.canRead() + "]";
 
-                File home = new File (Bootstrap.getCatalinaHome());
+                File home = new File(Bootstrap.getCatalinaHome());
                 home = home.getCanonicalFile();
-                File base = new File (Bootstrap.getCatalinaBase());
+                File base = new File(Bootstrap.getCatalinaBase());
                 base = base.getCanonicalFile();
                 File defaultValue = new File(base, "lib");
 
@@ -278,9 +278,9 @@ public final class ClassLoaderFactory {
                 return false;
             }
         }
+        // else URL 不做校验
         return true;
     }
-
 
     /*
      * These two methods would ideally be in the utility class
@@ -296,7 +296,6 @@ public final class ClassLoaderFactory {
         return new URL(result);
     }
 
-
     private static URL buildClassLoaderUrl(File file) throws MalformedURLException {
         // Could be a directory or a file
         String fileUrlString = file.toURI().toString();
@@ -304,16 +303,34 @@ public final class ClassLoaderFactory {
         return new URL(fileUrlString);
     }
 
-
     public enum RepositoryType {
+        /**
+         * 指向一个目录，里面是 .class/资源
+         */
         DIR,
+
+        /**
+         * 指向一个目录，里面是 .jar
+         * <p>
+         * 名字大概取自于 global pattern (shell 的通配符)
+         */
         GLOB,
+
+        /**
+         * 指向单个 JAR 文件
+         */
         JAR,
+
+        /**
+         * 完整的 URL
+         */
         URL
     }
 
     public static class Repository {
+
         private String location;
+
         private RepositoryType type;
 
         public Repository(String location, RepositoryType type) {
@@ -328,5 +345,7 @@ public final class ClassLoaderFactory {
         public RepositoryType getType() {
             return type;
         }
+
     }
+
 }
