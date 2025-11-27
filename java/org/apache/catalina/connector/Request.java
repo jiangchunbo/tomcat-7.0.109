@@ -2382,6 +2382,7 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getQueryString() {
+        // 查询字符串是由 Connector 中的 Request 解析的
         return coyoteRequest.queryString().toString();
     }
 

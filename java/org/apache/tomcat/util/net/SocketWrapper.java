@@ -22,6 +22,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 public class SocketWrapper<E> {
 
+    /**
+     * 虽然是泛型，其实就是 Socket
+     */
     protected volatile E socket;
 
     // Volatile because I/O and setting the timeout values occurs on a different

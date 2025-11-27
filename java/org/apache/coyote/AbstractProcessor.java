@@ -35,6 +35,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
+ * <p>
+ * 当 ServerSocket 收到请求，将会创建 Processor 解析请求[其实就是读取数据]
  */
 public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
@@ -44,13 +46,21 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected char[] hostNameC = new char[0];
 
     protected Adapter adapter;
-    protected AsyncStateMachine<S> asyncStateMachine;
-    protected AbstractEndpoint<S> endpoint;
-    protected Request request;
-    protected Response response;
-    protected SocketWrapper<S> socketWrapper = null;
-    private int maxCookieCount = 200;
 
+    protected AsyncStateMachine<S> asyncStateMachine;
+
+    protected AbstractEndpoint<S> endpoint;
+
+    /**
+     * 底层请求数据
+     */
+    protected Request request;
+
+    protected Response response;
+
+    protected SocketWrapper<S> socketWrapper = null;
+
+    private int maxCookieCount = 200;
 
     /**
      * Error state for the request/response currently being processed.
@@ -78,12 +88,12 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         userDataHelper = new UserDataHelper(getLog());
     }
 
-
     /**
      * Update the current error state to the new error state if the new error
      * state is more severe than the current error state.
+     *
      * @param errorState The error status details
-     * @param t The error which occurred
+     * @param t          The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
         if (getLog().isDebugEnabled()) {
@@ -110,11 +120,9 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         }
     }
 
-
     protected void resetErrorState() {
         errorState = ErrorState.NONE;
     }
-
 
     protected ErrorState getErrorState() {
         return errorState;
@@ -122,12 +130,11 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
     /**
      * @return The endpoint receiving connections that are handled by this
-     *         processor.
+     * processor.
      */
     protected AbstractEndpoint<S> getEndpoint() {
         return endpoint;
     }
-
 
     /**
      * The request associated with this processor.
@@ -136,7 +143,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     public Request getRequest() {
         return request;
     }
-
 
     /**
      * Set the associated adapter.
@@ -147,7 +153,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         this.adapter = adapter;
     }
 
-
     /**
      * Get the associated adapter.
      *
@@ -157,15 +162,14 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         return adapter;
     }
 
-
     /**
      * Set the socket wrapper being used.
+     *
      * @param socketWrapper The socket wrapper
      */
     protected final void setSocketWrapper(SocketWrapper<S> socketWrapper) {
         this.socketWrapper = socketWrapper;
     }
-
 
     /**
      * @return the socket wrapper being used.
@@ -173,7 +177,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected final SocketWrapper<S> getSocketWrapper() {
         return socketWrapper;
     }
-
 
     /**
      * @return the Executor used by the underlying endpoint.
@@ -183,18 +186,15 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         return endpoint.getExecutor();
     }
 
-
     @Override
     public boolean isAsync() {
         return (asyncStateMachine != null && asyncStateMachine.isAsync());
     }
 
-
     @Override
     public SocketState asyncPostProcess() {
         return asyncStateMachine.asyncPostProcess();
     }
-
 
     @Override
     public void errorDispatch() {
@@ -274,7 +274,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         }
     }
 
-
     /**
      * Called when a host header is not present in the request (e.g. HTTP/1.0).
      * It populates the server name with appropriate information. The source is
@@ -286,7 +285,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         // NO-OP
     }
 
-
     /**
      * Called when a host header is not present or is empty in the request (e.g.
      * HTTP/1.0). It populates the server port with appropriate information. The
@@ -297,7 +295,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected void populatePort() {
         // NO-OP
     }
-
 
     @Override
     public abstract boolean isUpgrade();
@@ -329,19 +326,16 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     @Override
     public abstract SocketState upgradeDispatch() throws IOException;
 
-
     public int getMaxCookieCount() {
         return maxCookieCount;
     }
-
 
     public void setMaxCookieCount(int maxCookieCount) {
         this.maxCookieCount = maxCookieCount;
     }
 
-
-     /**
-     * @deprecated  Will be removed in Tomcat 8.0.x.
+    /**
+     * @deprecated Will be removed in Tomcat 8.0.x.
      */
     @Deprecated
     @Override
@@ -349,9 +343,9 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
     protected abstract Log getLog();
 
-
     @Override
     public final AsyncStateMachine<S> getAsyncStateMachine() {
         return asyncStateMachine;
     }
+
 }
